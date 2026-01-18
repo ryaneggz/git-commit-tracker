@@ -1,0 +1,11 @@
+**/node_modules
+**/dist
+**/build
+**/output
+**/temp
+**/cache
+**/logs
+**/*.log
+**/.env*
+**/prd.json
+**/progress.txt
