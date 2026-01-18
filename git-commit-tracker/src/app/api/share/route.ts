@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "@/lib/auth";
+import type { Commit } from "@/lib/github";
 
 interface ShareData {
   repos: string[];
   dateFrom?: string;
   dateTo?: string;
   username: string;
+  commits: Commit[];
 }
 
 /**
@@ -21,10 +23,11 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { repos, dateFrom, dateTo } = body as {
+    const { repos, dateFrom, dateTo, commits } = body as {
       repos: string[];
       dateFrom?: string;
       dateTo?: string;
+      commits: Commit[];
     };
 
     if (!repos || !Array.isArray(repos) || repos.length === 0) {
@@ -34,10 +37,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!commits || !Array.isArray(commits)) {
+      return NextResponse.json(
+        { error: "Commits data is required" },
+        { status: 400 }
+      );
+    }
+
     // Create share data object
     const shareData: ShareData = {
       repos,
       username: session.user.name || "Anonymous",
+      commits,
     };
 
     if (dateFrom) {

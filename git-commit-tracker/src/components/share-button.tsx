@@ -5,10 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Link, Copy, Check, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import type { DateRangeState } from "@/components/date-range-picker";
+import type { Commit } from "@/lib/github";
 
 interface ShareButtonProps {
   selectedRepos: string[];
   dateRange: DateRangeState;
+  commits: Commit[];
   className?: string;
 }
 
@@ -18,6 +20,7 @@ interface ShareButtonProps {
 export function ShareButton({
   selectedRepos,
   dateRange,
+  commits,
   className,
 }: ShareButtonProps) {
   const [generating, setGenerating] = React.useState(false);
@@ -45,6 +48,7 @@ export function ShareButton({
           repos: selectedRepos,
           dateFrom: dateRange.from?.toISOString(),
           dateTo: dateRange.to?.toISOString(),
+          commits,
         }),
       });
 
