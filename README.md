@@ -1,8 +1,8 @@
-# Commitline
+# GitStat
 
 **Show your momentum. Prove your compounding progress.**
 
-Commitline transforms your GitHub commit history into a visual timeline of momentum, making exponential growth obvious and shareable.
+GitStat transforms your GitHub commit history into a visual timeline of momentum, making exponential growth obvious and shareable.
 
 ## Features
 
@@ -33,7 +33,7 @@ Commitline transforms your GitHub commit history into a visual timeline of momen
 ### Installation
 
 ```bash
-cd git-commit-tracker
+cd gitstat
 npm install
 ```
 
@@ -49,7 +49,7 @@ cp .env.example .env.local
    - Go to [GitHub Developer Settings](https://github.com/settings/developers)
    - Click **OAuth Apps** > **New OAuth App**
    - Fill in the application details:
-     - **Application name**: Commitline (or your preferred name)
+     - **Application name**: GitStat (or your preferred name)
      - **Homepage URL**: `http://localhost:3000`
      - **Authorization callback URL**: `http://localhost:3000/api/auth/callback/github`
    - Click **Register application**
@@ -78,7 +78,7 @@ NEXTAUTH_URL=http://localhost:3000
 ### Running Development Server
 
 ```bash
-cd git-commit-tracker
+cd gitstat
 npm run dev
 ```
 
@@ -113,7 +113,7 @@ npm install -g netlify-cli
 2. Build the project:
 
 ```bash
-cd git-commit-tracker
+cd gitstat
 npm run build
 ```
 
@@ -132,9 +132,9 @@ netlify deploy --prod
 3. Connect your GitHub repository
 
 4. Configure build settings:
-   - **Base directory**: `git-commit-tracker`
+   - **Base directory**: `gitstat`
    - **Build command**: `npm run build`
-   - **Publish directory**: `git-commit-tracker/.next`
+   - **Publish directory**: `gitstat/.next`
 
 5. Add environment variables in **Site settings** > **Environment variables**:
    - `GITHUB_ID` - Your GitHub OAuth Client ID
@@ -154,7 +154,7 @@ Create `netlify.toml` in the repository root for consistent deployments:
 
 ```toml
 [build]
-  base = "git-commit-tracker"
+  base = "gitstat"
   command = "npm run build"
   publish = ".next"
 
@@ -171,7 +171,7 @@ npm install -D @netlify/plugin-nextjs
 ## Project Structure
 
 ```
-git-commit-tracker/
+gitstat/
 ├── src/
 │   ├── app/
 │   │   ├── api/

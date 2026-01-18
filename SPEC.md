@@ -1,9 +1,9 @@
 ---
-task: Build Commitline - GitHub commit visualization app
+task: Build GitStat - GitHub commit visualization app
 test_command: "npm run build && npm run lint && npm run test"
 ---
 
-# Task: Commitline MVP
+# Task: GitStat MVP
 
 Build a lightweight visualization app that transforms Git commit history into a linear timeline of momentum, making exponential growth obvious and shareable.
 
@@ -88,8 +88,8 @@ $ npm run dev
    - Y-axis: 0 to 847 commits
    - Cumulative line with visible acceleration
    - Velocity badge: "127 commits/month (+23%)"
-5. Click "Export PNG" -> downloads commitline-username-2026-01-17.png
-6. Click "Copy Link" -> copies https://commitline.app/share/abc123
+5. Click "Export PNG" -> downloads gitstat-username-2026-01-17.png
+6. Click "Copy Link" -> copies https://gitstat.app/share/abc123
 ```
 
 ---

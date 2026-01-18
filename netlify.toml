@@ -1,5 +1,5 @@
 [build]
-  base = "git-commit-tracker"
+  base = "gitstat"
   command = "npm run build"
   publish = ".next"
 

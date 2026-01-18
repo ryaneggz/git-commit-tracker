@@ -151,7 +151,7 @@ export default function DashboardPage() {
           {selectedRepos.length > 0 && commits.length > 0 && !loading && (
             <div className="flex items-center gap-2">
               <ShareButton selectedRepos={selectedRepos} dateRange={dateRange} commits={commits} />
-              <ExportButton targetRef={chartRef} filename="commitline-chart" />
+              <ExportButton targetRef={chartRef} filename="gitstat-chart" />
             </div>
           )}
         </CardHeader>

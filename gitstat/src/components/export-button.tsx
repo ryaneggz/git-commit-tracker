@@ -17,7 +17,7 @@ interface ExportButtonProps {
  */
 export function ExportButton({
   targetRef,
-  filename = "commitline-chart",
+  filename = "gitstat-chart",
   className,
 }: ExportButtonProps) {
   const [exporting, setExporting] = React.useState(false);

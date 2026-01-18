@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Commitline** is a lightweight visualization app that transforms GitHub commit history into a linear timeline showing momentum and compounding progress. Target users are developers who build in public and want to showcase their productivity growth.
+**GitStat** is a lightweight visualization app that transforms GitHub commit history into a linear timeline showing momentum and compounding progress. Target users are developers who build in public and want to showcase their productivity growth.
 
 ## Tech Stack
 

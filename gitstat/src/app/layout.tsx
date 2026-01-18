@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Commitline",
+  title: "GitStat",
   description: "Visualize your GitHub commit history as an interactive timeline",
 };
 

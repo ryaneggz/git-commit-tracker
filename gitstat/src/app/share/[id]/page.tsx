@@ -108,7 +108,7 @@ export default function SharePage() {
       <header className="border-b bg-card">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <Link href="/" className="text-xl font-bold">
-            Commitline
+            GitStat
           </Link>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <User className="h-4 w-4" />

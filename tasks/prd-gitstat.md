@@ -1,8 +1,8 @@
-# PRD: Commitline - GitHub Commit Visualization
+# PRD: GitStat - GitHub Commit Visualization
 
 ## Introduction
 
-Commitline is a personal GitHub commit visualization tool that displays a user's commit history as an interactive timeline chart. Users authenticate via GitHub OAuth, select repositories to track, and view their commit velocity over time. The app supports exporting visualizations as shareable images.
+GitStat is a personal GitHub commit visualization tool that displays a user's commit history as an interactive timeline chart. Users authenticate via GitHub OAuth, select repositories to track, and view their commit velocity over time. The app supports exporting visualizations as shareable images.
 
 ## Goals
 

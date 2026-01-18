@@ -17,7 +17,7 @@ export default async function DashboardLayout({
     <div className="min-h-screen flex flex-col">
       <header className="border-b border-border bg-background">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-xl font-bold">Commitline</h1>
+          <h1 className="text-xl font-bold">GitStat</h1>
           <UserNav />
         </div>
       </header>
