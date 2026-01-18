@@ -8,6 +8,7 @@ import { VelocityMetrics } from "@/components/velocity-metrics";
 import type { Commit } from "@/lib/github";
 import { Loader2, User } from "lucide-react";
 import Link from "next/link";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 interface ShareData {
   repos: string[];
@@ -110,9 +111,12 @@ export default function SharePage() {
           <Link href="/" className="text-xl font-bold">
             GitStat
           </Link>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <User className="h-4 w-4" />
-            <span>Shared by {shareData.username}</span>
+          <div className="flex items-center gap-4">
+            <ThemeToggle />
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <User className="h-4 w-4" />
+              <span>Shared by {shareData.username}</span>
+            </div>
           </div>
         </div>
       </header>

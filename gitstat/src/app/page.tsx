@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getServerSession } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 function GitHubIcon({ className }: { className?: string }) {
   return (
@@ -107,6 +108,11 @@ export default async function LandingPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Header with theme toggle */}
+      <header className="absolute top-0 right-0 p-4">
+        <ThemeToggle />
+      </header>
+
       {/* Hero Section */}
       <div className="flex flex-col items-center justify-center px-4 py-24 text-center sm:py-32">
         <h1 className="max-w-3xl text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl">

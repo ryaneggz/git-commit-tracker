@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export function UserNav() {
   const { data: session } = useSession();
@@ -13,6 +14,7 @@ export function UserNav() {
 
   return (
     <div className="flex items-center gap-4">
+      <ThemeToggle />
       <div className="flex items-center gap-2">
         {session.user.image && (
           <Image

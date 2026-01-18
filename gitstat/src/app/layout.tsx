@@ -19,13 +19,29 @@ export const metadata: Metadata = {
   description: "Visualize your GitHub commit history as an interactive timeline",
 };
 
+// Inline script to prevent flash of incorrect theme
+// Runs synchronously before React hydration
+const themeInitScript = `
+  (function() {
+    try {
+      var theme = localStorage.getItem('gitstat-theme');
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      }
+    } catch (e) {}
+  })();
+`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
