@@ -10,12 +10,35 @@ export interface Repository {
   updatedAt: string;
 }
 
+export interface Commit {
+  sha: string;
+  message: string;
+  date: string;
+  author: string;
+}
+
+export interface DateRange {
+  since?: string; // ISO 8601 date string
+  until?: string; // ISO 8601 date string
+}
+
 interface GitHubRepoResponse {
   id: number;
   name: string;
   full_name: string;
   private: boolean;
   updated_at: string;
+}
+
+interface GitHubCommitResponse {
+  sha: string;
+  commit: {
+    message: string;
+    author: {
+      name: string;
+      date: string;
+    };
+  };
 }
 
 /**
@@ -77,6 +100,85 @@ export async function getRepositories(
     return repos;
   } catch (error) {
     console.error("Error fetching repositories:", error);
+    return [];
+  }
+}
+
+/**
+ * Fetches commits from a repository
+ * @param accessToken - OAuth access token from the user's session
+ * @param repoFullName - Full repository name (e.g., "owner/repo")
+ * @param dateRange - Optional date range to filter commits
+ * @returns Array of commits or empty array on error
+ */
+export async function getCommits(
+  accessToken: string,
+  repoFullName: string,
+  dateRange?: DateRange
+): Promise<Commit[]> {
+  try {
+    const commits: Commit[] = [];
+    let page = 1;
+    const perPage = 100;
+
+    while (true) {
+      // Build URL with query parameters
+      const params = new URLSearchParams({
+        per_page: perPage.toString(),
+        page: page.toString(),
+      });
+
+      if (dateRange?.since) {
+        params.set("since", dateRange.since);
+      }
+      if (dateRange?.until) {
+        params.set("until", dateRange.until);
+      }
+
+      const response = await fetch(
+        `https://api.github.com/repos/${repoFullName}/commits?${params.toString()}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            Accept: "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        console.error(
+          `GitHub API error fetching commits: ${response.status} ${response.statusText}`
+        );
+        return [];
+      }
+
+      const data: GitHubCommitResponse[] = await response.json();
+
+      if (data.length === 0) {
+        break;
+      }
+
+      commits.push(
+        ...data.map((commit) => ({
+          sha: commit.sha,
+          message: commit.commit.message,
+          date: commit.commit.author.date,
+          author: commit.commit.author.name,
+        }))
+      );
+
+      // If we got fewer than perPage, we've reached the last page
+      if (data.length < perPage) {
+        break;
+      }
+
+      page++;
+    }
+
+    return commits;
+  } catch (error) {
+    console.error("Error fetching commits:", error);
     return [];
   }
 }
