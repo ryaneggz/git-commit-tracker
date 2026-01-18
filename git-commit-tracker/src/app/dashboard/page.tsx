@@ -11,6 +11,7 @@ import {
 import { TimelineChart } from "@/components/timeline-chart";
 import { VelocityMetrics } from "@/components/velocity-metrics";
 import { ExportButton } from "@/components/export-button";
+import { ShareButton } from "@/components/share-button";
 import { fetchCommits } from "@/app/actions/commits";
 import { fetchRepositories } from "@/app/actions/repositories";
 import type { Commit, Repository } from "@/lib/github";
@@ -124,7 +125,10 @@ export default function DashboardPage() {
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle>Commit Timeline</CardTitle>
           {selectedRepos.length > 0 && commits.length > 0 && !loading && (
-            <ExportButton targetRef={chartRef} filename="commitline-chart" />
+            <div className="flex items-center gap-2">
+              <ShareButton selectedRepos={selectedRepos} dateRange={dateRange} />
+              <ExportButton targetRef={chartRef} filename="commitline-chart" />
+            </div>
           )}
         </CardHeader>
         <CardContent className="relative">
