@@ -4,15 +4,32 @@ import { getServerSession } from "@/lib/auth";
 import { getRepositories, Repository } from "@/lib/github";
 
 /**
- * Server action to fetch the current user's repositories
- * @returns Array of repositories or empty array if not authenticated
+ * Result type for server actions that can return rate limit errors
  */
-export async function fetchRepositories(): Promise<Repository[]> {
+export type ActionResult<T> =
+  | { success: true; data: T }
+  | { success: false; error: string; minutesUntilReset?: number };
+
+/**
+ * Server action to fetch the current user's repositories
+ * @returns Result with array of repositories or error message
+ */
+export async function fetchRepositories(): Promise<ActionResult<Repository[]>> {
   const session = await getServerSession();
 
   if (!session?.accessToken) {
-    return [];
+    return { success: true, data: [] };
   }
 
-  return getRepositories(session.accessToken);
+  const result = await getRepositories(session.accessToken);
+
+  if (!result.success) {
+    return {
+      success: false,
+      error: result.error.message,
+      minutesUntilReset: result.error.minutesUntilReset,
+    };
+  }
+
+  return { success: true, data: result.data };
 }

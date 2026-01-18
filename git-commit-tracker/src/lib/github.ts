@@ -2,6 +2,55 @@
  * GitHub API client for fetching user data
  */
 
+/**
+ * Custom error type for GitHub API rate limit errors
+ */
+export class GitHubRateLimitError extends Error {
+  public resetTime: Date;
+  public minutesUntilReset: number;
+
+  constructor(resetTimestamp: number) {
+    const resetTime = new Date(resetTimestamp * 1000);
+    const now = new Date();
+    const minutesUntilReset = Math.max(
+      1,
+      Math.ceil((resetTime.getTime() - now.getTime()) / (1000 * 60))
+    );
+
+    super(
+      `GitHub API rate limit exceeded. Try again in ${minutesUntilReset} minute${minutesUntilReset === 1 ? "" : "s"}.`
+    );
+
+    this.name = "GitHubRateLimitError";
+    this.resetTime = resetTime;
+    this.minutesUntilReset = minutesUntilReset;
+  }
+}
+
+/**
+ * Result type for GitHub API calls that can return data or a rate limit error
+ */
+export type GitHubResult<T> =
+  | { success: true; data: T }
+  | { success: false; error: GitHubRateLimitError };
+
+/**
+ * Helper to check if a response is a rate limit error
+ */
+function checkRateLimitError(response: Response): GitHubRateLimitError | null {
+  if (response.status === 403) {
+    const rateLimitRemaining = response.headers.get("x-ratelimit-remaining");
+    const rateLimitReset = response.headers.get("x-ratelimit-reset");
+
+    // GitHub returns 403 with x-ratelimit-remaining: 0 when rate limited
+    if (rateLimitRemaining === "0" && rateLimitReset) {
+      const resetTimestamp = parseInt(rateLimitReset, 10);
+      return new GitHubRateLimitError(resetTimestamp);
+    }
+  }
+  return null;
+}
+
 export interface Repository {
   id: number;
   name: string;
@@ -44,11 +93,11 @@ interface GitHubCommitResponse {
 /**
  * Fetches user's repositories from the GitHub API
  * @param accessToken - OAuth access token from the user's session
- * @returns Array of repositories or empty array on error
+ * @returns Result with array of repositories or rate limit error
  */
 export async function getRepositories(
   accessToken: string
-): Promise<Repository[]> {
+): Promise<GitHubResult<Repository[]>> {
   try {
     const repos: Repository[] = [];
     let page = 1;
@@ -66,11 +115,17 @@ export async function getRepositories(
         }
       );
 
+      // Check for rate limit error
+      const rateLimitError = checkRateLimitError(response);
+      if (rateLimitError) {
+        return { success: false, error: rateLimitError };
+      }
+
       if (!response.ok) {
         console.error(
           `GitHub API error: ${response.status} ${response.statusText}`
         );
-        return [];
+        return { success: true, data: [] };
       }
 
       const data: GitHubRepoResponse[] = await response.json();
@@ -97,10 +152,10 @@ export async function getRepositories(
       page++;
     }
 
-    return repos;
+    return { success: true, data: repos };
   } catch (error) {
     console.error("Error fetching repositories:", error);
-    return [];
+    return { success: true, data: [] };
   }
 }
 
@@ -109,13 +164,13 @@ export async function getRepositories(
  * @param accessToken - OAuth access token from the user's session
  * @param repoFullName - Full repository name (e.g., "owner/repo")
  * @param dateRange - Optional date range to filter commits
- * @returns Array of commits or empty array on error
+ * @returns Result with array of commits or rate limit error
  */
 export async function getCommits(
   accessToken: string,
   repoFullName: string,
   dateRange?: DateRange
-): Promise<Commit[]> {
+): Promise<GitHubResult<Commit[]>> {
   try {
     const commits: Commit[] = [];
     let page = 1;
@@ -146,11 +201,17 @@ export async function getCommits(
         }
       );
 
+      // Check for rate limit error
+      const rateLimitError = checkRateLimitError(response);
+      if (rateLimitError) {
+        return { success: false, error: rateLimitError };
+      }
+
       if (!response.ok) {
         console.error(
           `GitHub API error fetching commits: ${response.status} ${response.statusText}`
         );
-        return [];
+        return { success: true, data: [] };
       }
 
       const data: GitHubCommitResponse[] = await response.json();
@@ -176,9 +237,9 @@ export async function getCommits(
       page++;
     }
 
-    return commits;
+    return { success: true, data: commits };
   } catch (error) {
     console.error("Error fetching commits:", error);
-    return [];
+    return { success: true, data: [] };
   }
 }

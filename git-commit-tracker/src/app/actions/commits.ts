@@ -2,25 +2,26 @@
 
 import { getServerSession } from "@/lib/auth";
 import { getCommits, Commit, DateRange } from "@/lib/github";
+import type { ActionResult } from "./repositories";
 
 /**
  * Server action to fetch commits from multiple repositories
  * @param repoFullNames - Array of repository full names (e.g., ["owner/repo1", "owner/repo2"])
  * @param dateRange - Optional date range to filter commits
- * @returns Array of commits from all repositories or empty array if not authenticated
+ * @returns Result with array of commits or rate limit error message
  */
 export async function fetchCommits(
   repoFullNames: string[],
   dateRange?: DateRange
-): Promise<Commit[]> {
+): Promise<ActionResult<Commit[]>> {
   const session = await getServerSession();
 
   if (!session?.accessToken) {
-    return [];
+    return { success: true, data: [] };
   }
 
   if (repoFullNames.length === 0) {
-    return [];
+    return { success: true, data: [] };
   }
 
   // Fetch commits from all repositories in parallel
@@ -28,13 +29,24 @@ export async function fetchCommits(
     getCommits(session.accessToken!, repoFullName, dateRange)
   );
 
-  const commitsArrays = await Promise.all(commitPromises);
+  const results = await Promise.all(commitPromises);
+
+  // Check if any result is a rate limit error
+  for (const result of results) {
+    if (!result.success) {
+      return {
+        success: false,
+        error: result.error.message,
+        minutesUntilReset: result.error.minutesUntilReset,
+      };
+    }
+  }
 
   // Flatten and sort all commits by date (newest first)
-  const allCommits = commitsArrays.flat();
+  const allCommits = results.flatMap((r) => (r.success ? r.data : []));
   allCommits.sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 
-  return allCommits;
+  return { success: true, data: allCommits };
 }

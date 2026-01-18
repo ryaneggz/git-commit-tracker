@@ -15,7 +15,8 @@ import { ShareButton } from "@/components/share-button";
 import { fetchCommits } from "@/app/actions/commits";
 import { fetchRepositories } from "@/app/actions/repositories";
 import type { Commit, Repository } from "@/lib/github";
-import { Loader2 } from "lucide-react";
+import { Loader2, AlertCircle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function DashboardPage() {
   const [selectedRepos, setSelectedRepos] = React.useState<string[]>([]);
@@ -27,14 +28,21 @@ export default function DashboardPage() {
   const [commits, setCommits] = React.useState<Commit[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [reposLoading, setReposLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
   const chartRef = React.useRef<HTMLDivElement>(null);
 
   // Load repositories on mount
   React.useEffect(() => {
     async function loadRepositories() {
       setReposLoading(true);
-      const repos = await fetchRepositories();
-      setRepositories(repos);
+      setError(null);
+      const result = await fetchRepositories();
+      if (!result.success) {
+        setError(result.error);
+        setRepositories([]);
+      } else {
+        setRepositories(result.data);
+      }
       setReposLoading(false);
     }
     loadRepositories();
@@ -49,6 +57,7 @@ export default function DashboardPage() {
       }
 
       setLoading(true);
+      setError(null);
 
       // Convert selected repo names to full names
       const selectedFullNames = repositories
@@ -56,11 +65,17 @@ export default function DashboardPage() {
         .map((repo) => repo.fullName);
 
       const githubDateRange = toGitHubDateRange(dateRange);
-      const fetchedCommits = await fetchCommits(
+      const result = await fetchCommits(
         selectedFullNames,
         githubDateRange.since || githubDateRange.until ? githubDateRange : undefined
       );
-      setCommits(fetchedCommits);
+
+      if (!result.success) {
+        setError(result.error);
+        setCommits([]);
+      } else {
+        setCommits(result.data);
+      }
       setLoading(false);
     }
 
@@ -70,6 +85,15 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Dashboard</h2>
+
+      {/* Rate Limit Error Alert */}
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Rate Limit Exceeded</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
 
       {/* Filters Section */}
       <Card>

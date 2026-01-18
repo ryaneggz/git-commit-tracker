@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { CheckIcon, ChevronsUpDown } from "lucide-react";
+import { CheckIcon, ChevronsUpDown, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,12 +32,19 @@ export function RepoSelector({
   const [open, setOpen] = React.useState(false);
   const [repositories, setRepositories] = React.useState<Repository[]>([]);
   const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     async function loadRepositories() {
       setLoading(true);
-      const repos = await fetchRepositories();
-      setRepositories(repos);
+      setError(null);
+      const result = await fetchRepositories();
+      if (!result.success) {
+        setError(result.error);
+        setRepositories([]);
+      } else {
+        setRepositories(result.data);
+      }
       setLoading(false);
     }
     loadRepositories();
@@ -54,6 +61,9 @@ export function RepoSelector({
   const getButtonText = () => {
     if (loading) {
       return "Loading repositories...";
+    }
+    if (error) {
+      return "Rate limit exceeded";
     }
     if (repositories.length === 0) {
       return "No repositories found";
@@ -74,9 +84,13 @@ export function RepoSelector({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between"
-          disabled={loading || repositories.length === 0}
+          className={cn(
+            "w-full justify-between",
+            error && "border-destructive text-destructive"
+          )}
+          disabled={loading || repositories.length === 0 || !!error}
         >
+          {error && <AlertCircle className="mr-2 h-4 w-4 shrink-0" />}
           <span className="truncate">{getButtonText()}</span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
